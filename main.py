@@ -9,7 +9,7 @@ import logging
 
 # Включение логирования
 logging.basicConfig(
-    format='%(asctime)s - %(name)s - %(levellevel)s - %(message)s',
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
     level=logging.INFO
 )
 logger = logging.getLogger(__name__)
@@ -20,8 +20,8 @@ TOKEN = os.getenv('TELEGRAM_TOKEN')
 ADMIN_IDS = list(map(int, os.getenv('ADMIN_IDS').split(',')))
 
 # Проверка наличия токена
-if not TOKEN:
-    raise ValueError("Необходимо указать TELEGRAM_TOKEN в файле .env")
+if not TOKEN or not ADMIN_IDS:
+    raise ValueError("Необходимо указать TELEGRAM_TOKEN и ADMIN_IDS в файле .env")
 
 # Пути к файлам
 USER_DATA_FILE = 'user_data.json'
@@ -162,8 +162,9 @@ def lab_work_selection(update: Update, context: CallbackContext):
         query.edit_message_text(text="Вы выбрали Лабораторная работа №2.")
     elif selected_lab == 'lab3':
         query.edit_message_text(text="Вы выбрали Лабораторная работа №3.")
-
-    # Можно добавить дополнительную логику для обработки выбранной лабораторной работы
+    
+    # Возврат в главное меню после выбора лабораторной работы
+    show_main_menu(update)
 
 # Отправка уведомлений
 def send_notifications(update: Update, context: CallbackContext):
@@ -193,6 +194,11 @@ def handle_notification(update: Update, context: CallbackContext):
         # Отправка уведомления администратору
         update.message.reply_text(f"Сообщение отправлено {sent_count} пользователям.")
 
+# Обработка ошибок
+def error_handler(update: Update, context: CallbackContext):
+    logger.error(msg="Exception while handling an update:", exc_info=context.error)
+    update.message.reply_text('Произошла ошибка. Пожалуйста, попробуйте еще раз позже.')
+
 def main():
     updater = Updater(TOKEN, use_context=True)
     dispatcher = updater.dispatcher
@@ -215,7 +221,9 @@ def main():
     dispatcher.add_handler(MessageHandler(Filters.regex('^🔬 Помочь с лабораторными$'), handle_lab_work))
     dispatcher.add_handler(CallbackQueryHandler(lab_work_selection, pattern='^lab[1-3]$'))
     dispatcher.add_handler(CommandHandler('notify', send_notifications))
+    dispatcher.add_handler(CommandHandler('stop_notify', handle_notification))
     dispatcher.add_handler(MessageHandler(Filters.text | Filters.photo, handle_notification))
+    dispatcher.add_error_handler(error_handler)
 
     updater.start_polling()
     updater.idle()
