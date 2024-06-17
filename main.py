@@ -28,7 +28,7 @@ USER_DATA_FILE = 'user_data.json'
 PHOTO_PATH = 'ekolina.jpg'
 
 # Константы для состояний
-ASK_NAME, ASK_FACULTY, ASK_GROUP, ASK_QUESTION = range(4)
+ASK_NAME, ASK_FACULTY, ASK_GROUP, ASK_QUESTION, LAB1_OBJECT, LAB1_BENEFIT1, LAB1_BENEFIT2, LAB1_BENEFIT3, LAB1_CONFIRM, LAB1_CHANGE = range(10)
 
 # Класс для работы с данными пользователей
 class UserDataManager:
@@ -89,7 +89,7 @@ def ask_name(update: Update, context: CallbackContext) -> int:
         update.message.reply_text("<b>Приятно познакомиться</b> 😊 А теперь укажите свой факультет 👇", parse_mode=ParseMode.HTML)
         return ASK_FACULTY
     else:
-        update.message.reply_text("Неправильно. Пожалуйста, напишите свою фамилию, имя и отчество в формате: Иванов Иван Иванович.")
+        update.message.reply_text("Неправильно. Пожалуйста, напишите свою фамилию, имя и отчество в формате: Иванов Иван Иванович.", parse_mode=ParseMode.HTML)
         return ASK_NAME
 
 # Обработка факультета пользователя
@@ -111,7 +111,7 @@ def ask_group(update: Update, context: CallbackContext) -> int:
     user_data = user_data_manager.get_user_data(user_id)
     user_data['group'] = group
     user_data_manager.update_user_data(user_id, user_data)
-    update.message.reply_text("Итак, чем я могу вам помочь? 🐭")
+    update.message.reply_text("Итак, чем я могу вам помочь? 🐭", parse_mode=ParseMode.HTML)
     show_main_menu(update)
     return ConversationHandler.END
 
@@ -121,7 +121,7 @@ def show_main_menu(update: Update):
         [KeyboardButton('🔎 Найти ответ на вопрос')],
         [KeyboardButton('🔬 Помочь с лабораторными')]
     ], resize_keyboard=True)
-    update.message.reply_text("Выберите действие:", reply_markup=reply_markup)
+    update.message.reply_text("Выберите действие:", reply_markup=reply_markup, parse_mode=ParseMode.HTML)
 
 # Обработка кнопки "Найти ответ на вопрос"
 def ask_question(update: Update, context: CallbackContext) -> int:
@@ -138,8 +138,8 @@ def handle_question(update: Update, context: CallbackContext) -> int:
 # Обработка кнопки "Помочь с лабораторными"
 def handle_lab_work(update: Update, context: CallbackContext):
     update.message.reply_text("<b>Добро пожаловать в мир лабораторных работ</b> 🙂", parse_mode=ParseMode.HTML)
-    update.message.reply_text("Здесь представлены три лабораторные работы. Ваша задача - выполнить их все. После этого, я помогу вам оформить отчет для отправки преподавателю.")
-    update.message.reply_text("Выберите номер лабораторной работы, используя кнопку ниже. ⬇️", reply_markup=get_lab_work_keyboard())
+    update.message.reply_text("Здесь представлены три лабораторные работы. Ваша задача - выполнить их все. После этого, я помогу вам оформить отчет для отправки преподавателю.", parse_mode=ParseMode.HTML)
+    update.message.reply_text("Выберите номер лабораторной работы, используя кнопку ниже. ⬇️", reply_markup=get_lab_work_keyboard(), parse_mode=ParseMode.HTML)
 
 # Получение клавиатуры с лабораторными работами
 def get_lab_work_keyboard():
@@ -157,23 +157,139 @@ def lab_work_selection(update: Update, context: CallbackContext):
     selected_lab = query.data
 
     if selected_lab == 'lab1':
-        query.edit_message_text(text="Вы выбрали Лабораторная работа №1.")
+        query.edit_message_text(text="Вы выбрали Лабораторная работа №1.", parse_mode=ParseMode.HTML)
+        # Отправка сообщений, связанных с лабораторной работой №1
+        context.bot.send_chat_action(chat_id=query.message.chat_id, action=ChatAction.TYPING)
+        time.sleep(1.5)
+        context.bot.send_photo(chat_id=query.message.chat_id, photo='https://drive.google.com/uc?export=view&id=1zv_PACb5zO436uyR-wsA2-ldezXgjy_A', caption="Вам необходимо провести анализ личного вклада в сокращение процента захораниваемых отходов. Данный анализ включает 3 пункта:", parse_mode=ParseMode.HTML)
+
+        time.sleep(1.5)
+        context.bot.send_chat_action(chat_id=query.message.chat_id, action=ChatAction.TYPING)
+        time.sleep(2)
+        context.bot.send_message(chat_id=query.message.chat_id, text="1. Проведите анализ возможности реализации раздельного сбора Вами лично на примере любого объекта, заполните Таблицу 1. Вы можете выбрать: дом, квартиру, дачу, общежитие, или даже ваше место работы, если оно конечно уже есть.\n2. Используя <a href='https://recyclemap.ru/'>https://recyclemap.ru/</a> (если ваш город есть в данном сервисе) или другой доступный вам ресурс, найдите ближайшие к вам точки раздельного сбора. Заполните Таблицу 2, указав точки и виды отходов, которые вы разделяете/сдаете или могли бы это делать в своем городе.\n3. Уже зная состав своей мусорной корзины, используйте пять простых принципов (5R), которые лежат в основе безотходного образа жизни и заполните таблицу 3. Постарайтесь не оставлять пустых ячеек в столбце “Могу делать в будущем”, вы наверняка можете больше, чем кажется.", parse_mode=ParseMode.HTML)
+
+        time.sleep(1.5)
+        context.bot.send_chat_action(chat_id=query.message.chat_id, action=ChatAction.TYPING)
+        time.sleep(2)
+        context.bot.send_photo(chat_id=query.message.chat_id, photo='https://drive.google.com/uc?export=view&id=1Ua7RYLVDSdQYfpViCqn8Ok8AqD1syteQ', caption="Начнем с таблицы № 1 – Анализ возможности реализации раздельного сбора.", parse_mode=ParseMode.HTML)
+
+        time.sleep(1.5)
+        context.bot.send_chat_action(chat_id=query.message.chat_id, action=ChatAction.TYPING)
+        time.sleep(2)
+        context.bot.send_message(chat_id=query.message.chat_id, text="Укажите <b>объект</b>, который вы будете анализировать", parse_mode=ParseMode.HTML)
+        return LAB1_OBJECT
     elif selected_lab == 'lab2':
-        query.edit_message_text(text="Вы выбрали Лабораторная работа №2.")
+        query.edit_message_text(text="Вы выбрали Лабораторная работа №2.", parse_mode=ParseMode.HTML)
+        show_main_menu(query.message)
     elif selected_lab == 'lab3':
-        query.edit_message_text(text="Вы выбрали Лабораторная работа №3.")
-    
-    # Возврат в главное меню после выбора лабораторной работы
-    show_main_menu(update)
+        query.edit_message_text(text="Вы выбрали Лабораторная работа №3.", parse_mode=ParseMode.HTML)
+        show_main_menu(query.message)
+
+# Обработка выбора объекта для лабораторной работы №1
+def lab1_object(update: Update, context: CallbackContext) -> int:
+    user_id = update.effective_user.id
+    user_data = user_data_manager.get_user_data(user_id)
+    user_data['lab1_object'] = update.message.text
+    user_data_manager.update_user_data(user_id, user_data)
+
+    context.bot.send_chat_action(chat_id=update.effective_chat.id, action=ChatAction.TYPING)
+    time.sleep(1.5)
+    update.message.reply_text("Переходим к первому вопросу – <b>Какие выгоды (экономические, социальные, экологические) вы и все участники процесса смогут получить благодаря раздельному сбору на выбранном объекте?</b>\nУкажите первый пункт из трех 👇", parse_mode=ParseMode.HTML)
+    return LAB1_BENEFIT1
+
+# Обработка первого пункта выгоды для лабораторной работы №1
+def lab1_benefit1(update: Update, context: CallbackContext) -> int:
+    user_id = update.effective_user.id
+    user_data = user_data_manager.get_user_data(user_id)
+    user_data['lab1_benefit1'] = update.message.text
+    user_data_manager.update_user_data(user_id, user_data)
+
+    context.bot.send_chat_action(chat_id=update.effective_chat.id, action=ChatAction.TYPING)
+    time.sleep(1.5)
+    update.message.reply_text("Хорошо 👌 Укажите второй пункт из трех 👇", parse_mode=ParseMode.HTML)
+    return LAB1_BENEFIT2
+
+# Обработка второго пункта выгоды для лабораторной работы №1
+def lab1_benefit2(update: Update, context: CallbackContext) -> int:
+    user_id = update.effective_user.id
+    user_data = user_data_manager.get_user_data(user_id)
+    user_data['lab1_benefit2'] = update.message.text
+    user_data_manager.update_user_data(user_id, user_data)
+
+    context.bot.send_chat_action(chat_id=update.effective_chat.id, action=ChatAction.TYPING)
+    time.sleep(1.5)
+    update.message.reply_text("Супер 👍 Укажите третий пункт 👇", parse_mode=ParseMode.HTML)
+    return LAB1_BENEFIT3
+
+# Обработка третьего пункта выгоды для лабораторной работы №1
+def lab1_benefit3(update: Update, context: CallbackContext) -> int:
+    user_id = update.effective_user.id
+    user_data = user_data_manager.get_user_data(user_id)
+    user_data['lab1_benefit3'] = update.message.text
+    user_data_manager.update_user_data(user_id, user_data)
+
+    context.bot.send_chat_action(chat_id=update.effective_chat.id, action=ChatAction.TYPING)
+    time.sleep(1.5)
+    benefits = (
+        f"<b>Преимущества:</b>\n"
+        f"Пункт 1: {user_data['lab1_benefit1']}\n"
+        f"Пункт 2: {user_data['lab1_benefit2']}\n"
+        f"Пункт 3: {user_data['lab1_benefit3']}\n"
+        f"Если все верно?"
+    )
+    buttons = [
+        [InlineKeyboardButton("Да", callback_data='confirm_yes')],
+        [InlineKeyboardButton("Нет", callback_data='confirm_no')],
+        [InlineKeyboardButton("Хочу добавить пункт", callback_data='confirm_add')]
+    ]
+    reply_markup = InlineKeyboardMarkup(buttons)
+    update.message.reply_text(benefits, reply_markup=reply_markup, parse_mode=ParseMode.HTML)
+    return LAB1_CONFIRM
+
+# Обработка подтверждения преимуществ
+def lab1_confirm(update: Update, context: CallbackContext) -> int:
+    query = update.callback_query
+    query.answer()
+    user_id = query.message.chat_id
+    user_data = user_data_manager.get_user_data(user_id)
+
+    if query.data == 'confirm_yes':
+        query.edit_message_text(text="Отлично! Лабораторная работа №1 завершена.", parse_mode=ParseMode.HTML)
+        show_main_menu(query.message)
+        return ConversationHandler.END
+    elif query.data == 'confirm_no':
+        query.edit_message_text(text="Какой пункт вы хотите изменить? Укажите номер пункта (1, 2 или 3):", parse_mode=ParseMode.HTML)
+        return LAB1_CHANGE
+    elif query.data == 'confirm_add':
+        query.edit_message_text(text="Добавьте еще один пункт:", parse_mode=ParseMode.HTML)
+        return LAB1_BENEFIT1
+
+def handle_lab1_confirm_change(update: Update, context: CallbackContext) -> int:
+    user_id = update.effective_user.id
+    user_data = user_data_manager.get_user_data(user_id)
+    change_point = update.message.text.strip()
+
+    if change_point == '1':
+        update.message.reply_text("Укажите новый пункт 1:", parse_mode=ParseMode.HTML)
+        context.user_data['lab1_edit'] = 'lab1_benefit1'
+        return LAB1_BENEFIT1
+    elif change_point == '2':
+        update.message.reply_text("Укажите новый пункт 2:", parse_mode=ParseMode.HTML)
+        context.user_data['lab1_edit'] = 'lab1_benefit2'
+        return LAB1_BENEFIT2
+    elif change_point == '3':
+        update.message.reply_text("Укажите новый пункт 3:", parse_mode=ParseMode.HTML)
+        context.user_data['lab1_edit'] = 'lab1_benefit3'
+        return LAB1_BENEFIT3
 
 # Отправка уведомлений
 def send_notifications(update: Update, context: CallbackContext):
     user_id = update.effective_user.id
     if user_id not in ADMIN_IDS:
-        update.message.reply_text("Эта функция доступна только для преподавателей.")
+        update.message.reply_text("Эта функция доступна только для преподавателей.", parse_mode=ParseMode.HTML)
         return
 
-    context.bot.send_message(chat_id=update.effective_chat.id, text="Что нужно отправить? Введите текст, цифры или отправьте изображение.")
+    context.bot.send_message(chat_id=update.effective_chat.id, text="Что нужно отправить? Введите текст, цифры или отправьте изображение.", parse_mode=ParseMode.HTML)
     context.user_data['awaiting_notification'] = True
 
 def handle_notification(update: Update, context: CallbackContext):
@@ -192,12 +308,12 @@ def handle_notification(update: Update, context: CallbackContext):
 
         context.user_data['awaiting_notification'] = False
         # Отправка уведомления администратору
-        update.message.reply_text(f"Сообщение отправлено {sent_count} пользователям.")
+        update.message.reply_text(f"Сообщение отправлено {sent_count} пользователям.", parse_mode=ParseMode.HTML)
 
 # Обработка ошибок
 def error_handler(update: Update, context: CallbackContext):
     logger.error(msg="Exception while handling an update:", exc_info=context.error)
-    update.message.reply_text('Произошла ошибка. Пожалуйста, попробуйте еще раз позже.')
+    update.message.reply_text('Произошла ошибка. Пожалуйста, попробуйте еще раз позже.', parse_mode=ParseMode.HTML)
 
 def main():
     updater = Updater(TOKEN, use_context=True)
@@ -210,9 +326,18 @@ def main():
             ASK_NAME: [MessageHandler(Filters.text & ~Filters.command, ask_name)],
             ASK_FACULTY: [MessageHandler(Filters.text & ~Filters.command, ask_faculty)],
             ASK_GROUP: [MessageHandler(Filters.text & ~Filters.command, ask_group)],
-            ASK_QUESTION: [MessageHandler(Filters.text & ~Filters.command, handle_question)]
+            ASK_QUESTION: [MessageHandler(Filters.text & ~Filters.command, handle_question)],
+            LAB1_OBJECT: [MessageHandler(Filters.text & ~Filters.command, lab1_object)],
+            LAB1_BENEFIT1: [MessageHandler(Filters.text & ~Filters.command, lab1_benefit1)],
+            LAB1_BENEFIT2: [MessageHandler(Filters.text & ~Filters.command, lab1_benefit2)],
+            LAB1_BENEFIT3: [MessageHandler(Filters.text & ~Filters.command, lab1_benefit3)],
+            LAB1_CONFIRM: [
+                CallbackQueryHandler(lab1_confirm, pattern='confirm_yes|confirm_no|confirm_add')
+            ],
+            LAB1_CHANGE: [MessageHandler(Filters.text & ~Filters.command, handle_lab1_confirm_change)]
         },
-        fallbacks=[CommandHandler('start', start)]
+        fallbacks=[CommandHandler('start', start)],
+        per_message=True  # Добавляем per_message=True
     )
     dispatcher.add_handler(conv_handler)
 
